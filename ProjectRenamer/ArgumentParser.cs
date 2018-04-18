@@ -27,7 +27,8 @@ namespace ProjectRenamer
             }
 
             var oldName = Path.GetFileNameWithoutExtension(oldPath);
-            var oldParentDir = Path.GetFileName(Path.GetDirectoryName(oldPath));
+            var oldDir = Path.GetDirectoryName(oldPath);
+            var oldParentDir = Path.GetFileName(oldDir);
 
             var newName = args[1];
             if (newName.EndsWith(_projExtension))
@@ -35,32 +36,35 @@ namespace ProjectRenamer
                 newName = newName.Substring(0, newName.IndexOf(_projExtension) - 1);
             }
 
-            var newPath = Path.Combine(Path.GetDirectoryName(Path.GetDirectoryName(oldPath)), newName, $"{newName}{_projExtension}");
+            var newDir = Path.Combine(Path.GetDirectoryName(oldDir), newName);
+            var newPath = Path.Combine(newDir, $"{newName}{_projExtension}");
             
             var searchDir = args.Length == 3 ? args[2] : null;
 
-            //if (!File.Exists(oldPath))
-            //{
-            //    throw new ArgumentException($"Project path '{oldPath}' does not exist.");
-            //}
+            if (!File.Exists(oldPath))
+            {
+                throw new ArgumentException($"Project path '{oldPath}' does not exist.");
+            }
 
-            //if (!IsValidPath(oldParentDir, newName))
-            //{
-            //    throw new ArgumentException($"New name '{newName}' is not valid.");
-            //}
+            if (!IsValidPath(oldParentDir, newName))
+            {
+                throw new ArgumentException($"New name '{newName}' is not valid.");
+            }
 
-            //if (searchDir != null && !Directory.Exists(searchDir))
-            //{
-            //    throw new ArgumentException($"Search directory '{searchDir}' does not exist.");
-            //}
+            if (searchDir != null && !Directory.Exists(searchDir))
+            {
+                throw new ArgumentException($"Search directory '{searchDir}' does not exist.");
+            }
 
             return new AppArguments
             {
                 OldProjectPath = oldPath,
                 OldProjectName = oldName,
+                OldProjectDirectory = oldDir,
                 OldProjectDirectParentDirectory = oldParentDir,
                 NewProjectName = newName,
                 NewProjectPath = newPath,
+                NewProjectDirectory = newDir,
                 SearchDirectory = searchDir
             };
         }

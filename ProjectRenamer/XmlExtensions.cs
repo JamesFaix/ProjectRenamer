@@ -11,6 +11,11 @@ namespace ProjectRenamer
             return @this.Attributes().Single(attr => attr.Name.LocalName == localName);
         }
 
+        public static IEnumerable<XAttribute> GetAttributesByLocalName(this XElement @this, string localName)
+        {
+            return @this.Attributes().Where(attr => attr.Name.LocalName == localName);
+        }
+
         public static XElement GetDescendantByLocalName(this XContainer @this, string localName)
         {
             return @this.Descendants().Single(attr => attr.Name.LocalName == localName);

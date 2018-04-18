@@ -10,16 +10,10 @@ namespace ProjectRenamer
     {
         public static void Rename(AppArguments args)
         {
-            Console.WriteLine("Renaming project file");
-
-            var oldDir = Path.GetDirectoryName(args.OldProjectPath);
-            var newDir = Path.GetDirectoryName(args.NewProjectPath);
-
-            Directory.Move(oldDir, newDir);
-
-            var oldPath = Path.Combine(newDir, $"{args.OldProjectName}.csproj");
-
-            File.Move(oldPath, args.NewProjectPath);
+            Console.WriteLine("Renaming project file");            
+            Directory.Move(args.OldProjectDirectory, args.NewProjectDirectory);
+            var tempPath = Path.Combine(args.NewProjectDirectory, $"{args.OldProjectName}.csproj");
+            File.Move(tempPath, args.NewProjectPath);
         }
 
         public static void UpdateProjectFileContents(AppArguments args)
@@ -36,9 +30,8 @@ namespace ProjectRenamer
 
                 xml.GetDescendantByLocalName("AssemblyName")
                     .SetValue(args.NewProjectName);
-
-                text = xml.ToString();
-                File.WriteAllText(args.NewProjectPath, text);
+                
+                File.WriteAllText(args.NewProjectPath, xml.ToString());
             }
             else
             {
@@ -49,15 +42,14 @@ namespace ProjectRenamer
         private static bool IsClassicProject(XDocument projectFile)
         {
             //Only look at top-level Project elements
-            var projectElement = projectFile.GetElementByLocalName("Project");
-
-            return !projectElement.Attributes()
-                .Any(attr => attr.Name.LocalName == "Sdk");
+            return !projectFile.GetElementByLocalName("Project")
+                .GetAttributesByLocalName("Sdk")
+                .Any();
         }
 
         public static void UpdateAssemblyInfo(AppArguments args)
         {
-            var asmInfoPath = Path.Combine(Path.GetDirectoryName(args.NewProjectPath), "Properties", "AssemblyInfo.cs");
+            var asmInfoPath = Path.Combine(args.NewProjectDirectory, "Properties", "AssemblyInfo.cs");
 
             if (File.Exists(asmInfoPath))
             {
@@ -107,11 +99,11 @@ namespace ProjectRenamer
                     {
                         var attr = renamedProjRef.GetAttributeByLocalName("Include");
 
-                        var oldPath = attr.Value;
-                        var pathBase = Path.GetDirectoryName(Path.GetDirectoryName(oldPath));
-                        var newPath = Path.Combine(pathBase, args.NewProjectName, $"{args.NewProjectName}.csproj");
+                        var oldRelativePath = attr.Value;
+                        var relativePathBase = Path.GetDirectoryName(Path.GetDirectoryName(oldRelativePath));
+                        var newRelativePath = Path.Combine(relativePathBase, args.NewProjectName, $"{args.NewProjectName}.csproj");
 
-                        attr.Value = newPath;
+                        attr.Value = newRelativePath;
 
                         if (IsClassicProject(xml))
                         {
@@ -119,8 +111,7 @@ namespace ProjectRenamer
                                 .SetValue(args.NewProjectName);
                         }
 
-                        text = xml.ToString();
-                        File.WriteAllText(p, text);
+                        File.WriteAllText(p, xml.ToString());
                     }                    
                 }
             }
