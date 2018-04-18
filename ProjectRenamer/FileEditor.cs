@@ -31,11 +31,11 @@ namespace ProjectRenamer
 
             if (IsClassicProject(xml))
             {
-                var rootNamespace = xml.Descendants().Single(el => el.Name.LocalName == "RootNamespace");
-                var assemblyName = xml.Descendants().Single(el => el.Name.LocalName == "AssemblyName");
+                xml.GetDescendantByLocalName("RootNamespace")
+                    .SetValue(args.NewProjectName);
 
-                rootNamespace.SetValue(args.NewProjectName);
-                assemblyName.SetValue(args.NewProjectName);
+                xml.GetDescendantByLocalName("AssemblyName")
+                    .SetValue(args.NewProjectName);
 
                 text = xml.ToString();
                 File.WriteAllText(args.NewProjectPath, text);
@@ -48,8 +48,8 @@ namespace ProjectRenamer
 
         private static bool IsClassicProject(XDocument projectFile)
         {
-            var projectElement = projectFile.Elements() //Only look at top-level Project elements
-                .Single(el => el.Name.LocalName == "Project");
+            //Only look at top-level Project elements
+            var projectElement = projectFile.GetElementByLocalName("Project");
 
             return !projectElement.Attributes()
                 .Any(attr => attr.Name.LocalName == "Sdk");
@@ -97,17 +97,15 @@ namespace ProjectRenamer
                     var text = File.ReadAllText(p);
                     var xml = XDocument.Parse(text);
 
-                    var projRefs = xml.Descendants().Where(el => el.Name.LocalName == "ProjectReference");
+                    var projRefs = xml.GetDescendantsByLocalName("ProjectReference");
 
-                    var renamedProjRef = projRefs.SingleOrDefault(projRef =>
-                    {
-                        var attr = projRef.Attributes().Single(at => at.Name.LocalName == "Include");
-                        return attr.Value.Contains(args.OldProjectName + ".csproj");
-                    });
+                    var renamedProjRef = projRefs.SingleOrDefault(projRef => 
+                        projRef.GetAttributeByLocalName("Include")
+                            .Value.Contains(args.OldProjectName + ".csproj"));
 
                     if (renamedProjRef != null)
                     {
-                        var attr = renamedProjRef.Attributes().Single(at => at.Name.LocalName == "Include");
+                        var attr = renamedProjRef.GetAttributeByLocalName("Include");
 
                         var oldPath = attr.Value;
                         var pathBase = Path.GetDirectoryName(Path.GetDirectoryName(oldPath));
@@ -117,7 +115,7 @@ namespace ProjectRenamer
 
                         if (IsClassicProject(xml))
                         {
-                            renamedProjRef.Descendants().Single(el => el.Name.LocalName == "Name")
+                            renamedProjRef.GetDescendantByLocalName("Name")
                                 .SetValue(args.NewProjectName);
                         }
 
