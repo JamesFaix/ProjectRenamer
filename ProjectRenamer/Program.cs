@@ -10,7 +10,7 @@ namespace ProjectRenamer
             {
                 var appArgs = ArgumentParser.ParseArgs(args);
 
-                //FileEditor.Rename(appArgs);
+                FileEditor.Rename(appArgs);
                 FileEditor.UpdateProjectFileContents(appArgs);
                 FileEditor.UpdateAssemblyInfo(appArgs);
                 FileEditor.UpdateReferencingProjects(appArgs);
