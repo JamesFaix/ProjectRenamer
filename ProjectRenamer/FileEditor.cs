@@ -28,8 +28,8 @@ namespace ProjectRenamer
             var text = File.ReadAllText(args.NewProjectPath);
             var xml = XDocument.Parse(text);
 
-            var rootNamespace = xml.Root.Descendants("RootNamespace").Single();
-            var assemblyName = xml.Root.Descendants("AssemblyName").Single();
+            var rootNamespace = xml.Descendants().Single(el => el.Name.LocalName == "RootNamespace");
+            var assemblyName = xml.Descendants().Single(el => el.Name.LocalName == "AssemblyName");
 
             rootNamespace.SetValue(args.NewProjectName);
             assemblyName.SetValue(args.NewProjectName);
@@ -40,8 +40,21 @@ namespace ProjectRenamer
 
         public static void UpdateAssemblyInfo(AppArguments args)
         {
-            Console.WriteLine("Updating assembly info file");
+            var asmInfoPath = Path.Combine(Path.GetDirectoryName(args.NewProjectPath), "AssemblyInfo.cs");
 
+            if (File.Exists(asmInfoPath))
+            {
+                Console.WriteLine("Updating assembly info file");
+                var text = File.ReadAllText(asmInfoPath);
+
+
+
+                File.WriteAllText(asmInfoPath, text);
+            }
+            else
+            {
+                Console.WriteLine("No assembly info found. Is this a .NET Core or .NET Standard project?");
+            }
         }
 
         public static void UpdateReferencingProjects(AppArguments args)

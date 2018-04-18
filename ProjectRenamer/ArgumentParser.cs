@@ -39,20 +39,20 @@ namespace ProjectRenamer
             
             var searchDir = args.Length == 3 ? args[2] : null;
 
-            if (!File.Exists(oldPath))
-            {
-                throw new ArgumentException($"Project path '{oldPath}' does not exist.");
-            }
+            //if (!File.Exists(oldPath))
+            //{
+            //    throw new ArgumentException($"Project path '{oldPath}' does not exist.");
+            //}
 
-            if (!IsValidPath(oldParentDir, newName))
-            {
-                throw new ArgumentException($"New name '{newName}' is not valid.");
-            }
+            //if (!IsValidPath(oldParentDir, newName))
+            //{
+            //    throw new ArgumentException($"New name '{newName}' is not valid.");
+            //}
 
-            if (searchDir != null && !Directory.Exists(searchDir))
-            {
-                throw new ArgumentException($"Search directory '{searchDir}' does not exist.");
-            }
+            //if (searchDir != null && !Directory.Exists(searchDir))
+            //{
+            //    throw new ArgumentException($"Search directory '{searchDir}' does not exist.");
+            //}
 
             return new AppArguments
             {

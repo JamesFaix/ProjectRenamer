@@ -15,6 +15,8 @@ namespace ProjectRenamer
                 FileEditor.UpdateAssemblyInfo(appArgs);
                 FileEditor.UpdateReferencingProjects(appArgs);
                 FileEditor.UpdateReferencingSolutions(appArgs);
+
+                Console.WriteLine("Done");
             }
             catch (Exception e)
             {
