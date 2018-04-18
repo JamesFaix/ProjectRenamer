@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 namespace ProjectRenamer
@@ -40,14 +41,15 @@ namespace ProjectRenamer
 
         public static void UpdateAssemblyInfo(AppArguments args)
         {
-            var asmInfoPath = Path.Combine(Path.GetDirectoryName(args.NewProjectPath), "AssemblyInfo.cs");
+            var asmInfoPath = Path.Combine(Path.GetDirectoryName(args.NewProjectPath), "Properties", "AssemblyInfo.cs");
 
             if (File.Exists(asmInfoPath))
             {
                 Console.WriteLine("Updating assembly info file");
                 var text = File.ReadAllText(asmInfoPath);
 
-
+                text = Regex.Replace(text, @"(\[assembly: AssemblyTitle\("")[^""]+(""\)\])", "${1}" + args.NewProjectName + "${2}");
+                text = Regex.Replace(text, @"(\[assembly: AssemblyProduct\("")[^""]+(""\)\])", "${1}" + args.NewProjectName + "${2}");
 
                 File.WriteAllText(asmInfoPath, text);
             }
