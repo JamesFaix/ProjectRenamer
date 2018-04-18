@@ -6,7 +6,22 @@ namespace ProjectRenamer
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            try
+            {
+                var appArgs = ArgumentParser.ParseArgs(args);
+
+                //FileEditor.Rename(appArgs);
+                FileEditor.UpdateProjectFileContents(appArgs);
+                FileEditor.UpdateAssemblyInfo(appArgs);
+                FileEditor.UpdateReferencingProjects(appArgs);
+                FileEditor.UpdateReferencingSolutions(appArgs);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"ERROR: {e.Message}\n{e.StackTrace}");
+            }
+
+            Console.Read();
         }
     }
 }
