@@ -134,7 +134,7 @@ namespace ProjectRenamer
 
                     var newText = Regex.Replace(oldText,
                         @"(?<Header>Project\(""\{[^""]+\}""\) = "")" + args.OldProjectName + @"(?<Middle>"", "")(?<PathBase>[^""]\\+)?(?<Dir>[^\\]+)\\(?<Name>[^""]+).csproj""",
-                        $"${{Header}}{args.NewProjectName}${{Middle}}${{PathBase}}{args.NewProjectName}\\{args.NewProjectName}.csproj");
+                        $"${{Header}}{args.NewProjectName}${{Middle}}${{PathBase}}{args.NewProjectName}\\{args.NewProjectName}.csproj\"");
 
                     if (oldText != newText)
                     {
